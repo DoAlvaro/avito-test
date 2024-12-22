@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      - db
+    environment:
+      - CONFIG_PATH=${CONFIG_PATH}
+      - POSTGRES_CONN=${POSTGRES_CONN}
+      - SERVER_PORT=${APP_PORT}
+      - SERVER_ADDRESS=0.0.0.0
+    volumes:
+      - logs:/logs
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  logs:
+    driver: local
+  db_data:
+    driver: local
